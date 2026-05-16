@@ -3,9 +3,7 @@
 <head>
   <title>Kaizen Knight</title>
 
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Kaizen Knight">
@@ -56,9 +54,7 @@
     }
 
     .screen.off,
-    .screen.boot-dark{
-      background:#111;
-    }
+    .screen.boot-dark{ background:#111; }
 
     .status-bar{
       height:38px;
@@ -113,41 +109,33 @@
 
     .pet-zone{
       width:240px;
-      height:130px;
+      height:125px;
       position:relative;
-      margin-bottom:-10px;
+      margin-bottom:-12px;
     }
 
     .pet-walker{
       position:absolute;
       left:50%;
-      bottom:28px;
+      bottom:25px;
       transform:translateX(-50%);
     }
 
-    .pet-bob{
-      animation:bob 1.2s infinite steps(2);
-    }
+    .pet-bob{ animation:bob 1.2s infinite steps(2); }
 
     .pet-img{
-      width:160px;
-      height:160px;
+      width:154px;
+      height:154px;
       display:block;
       image-rendering:pixelated;
       image-rendering:crisp-edges;
-      -ms-interpolation-mode:nearest-neighbor;
       object-fit:contain;
       opacity:.92;
       filter:grayscale(1) contrast(2) brightness(.55);
     }
 
-    .pet-walker.right .pet-img{
-      transform:scaleX(-1);
-    }
-
-    .pet-walker.left .pet-img{
-      transform:scaleX(1);
-    }
+    .pet-walker.right .pet-img{ transform:scaleX(-1); }
+    .pet-walker.left .pet-img{ transform:scaleX(1); }
 
     @keyframes bob{
       0%{transform:translateY(0)}
@@ -155,21 +143,33 @@
       100%{transform:translateY(0)}
     }
 
+    .growth{
+      font-size:42px;
+      line-height:1;
+      margin-bottom:8px;
+      filter:grayscale(1) contrast(2);
+    }
+
     .ground{
       width:100px;
       border-bottom:4px solid #111;
-      margin-bottom:14px;
+      margin-bottom:12px;
     }
 
     .textbox{
       width:100%;
       background:#f8f8f8;
       border-top:4px solid #111;
-      padding:10px;
+      padding:8px;
       box-sizing:border-box;
       text-align:center;
-      font-size:26px;
-      line-height:1.05;
+      font-size:24px;
+      line-height:1.02;
+    }
+
+    .subline{
+      font-size:21px;
+      opacity:.9;
     }
 
     .checklist-wrapper{
@@ -183,7 +183,7 @@
 
     .check-title{
       text-align:center;
-      font-size:26px;
+      font-size:25px;
       padding:5px;
       border-bottom:4px solid #111;
       flex-shrink:0;
@@ -193,8 +193,15 @@
       flex:1;
       min-height:0;
       overflow-y:auto;
-      padding:8px 10px;
+      padding:7px 10px;
       box-sizing:border-box;
+    }
+
+    .section-label{
+      font-size:23px;
+      margin:7px 0 4px;
+      border-bottom:3px solid #111;
+      letter-spacing:1px;
     }
 
     .rule{
@@ -202,7 +209,7 @@
       align-items:center;
       gap:8px;
       margin-bottom:5px;
-      font-size:23px;
+      font-size:22px;
       line-height:.95;
     }
 
@@ -215,8 +222,14 @@
       cursor:pointer;
     }
 
-    .box.checked{
-      background:#111;
+    .box.checked{ background:#111; }
+
+    .small-note{
+      font-size:19px;
+      line-height:.95;
+      opacity:.85;
+      margin:4px 0 8px;
+      text-align:center;
     }
 
     .check-buttons{
@@ -230,12 +243,12 @@
 
     .mini-btn{
       flex:1;
-      height:36px;
+      height:34px;
       background:#111;
       color:white;
       border:none;
       font-family:'VT323', monospace;
-      font-size:24px;
+      font-size:23px;
       cursor:pointer;
     }
 
@@ -320,29 +333,59 @@
   </div>
 
   <div class="buttons">
-    <button onclick="showChecklist()">CHECK</button>
-    <button onclick="showWeek()">WEEK</button>
+    <button onclick="showVows()">VOWS</button>
+    <button onclick="showStatus()">STATUS</button>
     <button onclick="resetWeek()">RESET</button>
   </div>
 
 </div>
 
 <script>
-const rules=[
-  "RISK SETTINGS LOCKED",
-  "MAX 5 CONTRACTS",
-  "JOURNALED TRADES",
-  "3PM LOCK CHECK",
-  "SECOND ACCT SAFE",
-  "STOPPED PAST -250",
-  "BOTH ACCTS JOURNALED",
-  "NO REVENGE TRADING",
-  "ROUTINE ONLY",
-  "COMPOSURE KEPT"
+const vowGroups=[
+  {
+    name:"PREP",
+    rules:[
+      "RISK LOCKED",
+      "MAX SIZE CONFIRMED",
+      "ROUTINE SELECTED"
+    ]
+  },
+  {
+    name:"SESSION",
+    rules:[
+      "STAYED IN ROUTINE",
+      "NO REVENGE TRADES",
+      "DID NOT OVERSIZE",
+      "COMPOSURE KEPT"
+    ]
+  },
+  {
+    name:"CLOSING",
+    rules:[
+      "JOURNAL COMPLETE",
+      "MISTAKES REVIEWED",
+      "SESSION CLOSED CLEAN"
+    ]
+  }
+];
+
+const triggers=[
+  "STOP HIT",
+  "ROUTINE BROKEN",
+  "EMOTION SPIKE"
+];
+
+const responses=[
+  "SECOND ACCT LOCKED",
+  "STEPPED AWAY",
+  "RESET BEFORE CONTINUE"
 ];
 
 const days=["MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY"];
 const shortDays=["MON","TUE","WED","THU","FRI"];
+
+let flatRules=[];
+vowGroups.forEach(g=>g.rules.forEach(r=>flatRules.push(r)));
 
 let todayIndex=getTradingDayIndex();
 let weekKey=getWeekKey();
@@ -411,12 +454,10 @@ function buildSounds(){
   sounds.tick=new Audio(makeToneWav(720,.045,.7));
   sounds.fail=new Audio(makeToneWav(170,.26,.8));
   sounds.reset=new Audio(makeToneWav(220,.18,.75));
-
   sounds.boot1=new Audio(makeToneWav(196,.09,.85));
   sounds.boot2=new Audio(makeToneWav(294,.10,.85));
   sounds.boot3=new Audio(makeToneWav(392,.11,.85));
   sounds.boot4=new Audio(makeToneWav(523,.15,.9));
-
   sounds.victory1=new Audio(makeToneWav(523,.13,.8));
   sounds.victory2=new Audio(makeToneWav(659,.13,.8));
   sounds.victory3=new Audio(makeToneWav(784,.24,.85));
@@ -429,7 +470,6 @@ function buildSounds(){
 
 function playSound(name){
   if(!sounds[name]) return;
-
   const s=sounds[name].cloneNode();
   s.volume=1;
   s.play().catch(()=>{});
@@ -446,6 +486,7 @@ function playBoot(){
 function playMenu(){ playSound("menu"); }
 function playTick(){ playSound("tick"); }
 function playFailure(){ playSound("fail"); }
+function playReset(){ playSound("reset"); }
 
 function playVictory(){
   playSound("victory1");
@@ -453,12 +494,17 @@ function playVictory(){
   setTimeout(()=>playSound("victory3"),300);
 }
 
-function playReset(){ playSound("reset"); }
-
 function getTradingDayIndex(){
   let d=new Date().getDay();
   if(d===0 || d===6) return -1;
   return d-1;
+}
+
+function getSessionName(){
+  let h=new Date().getHours();
+  if(h>=18 || h<3) return "PM SESSION";
+  if(h>=8 && h<13) return "AM SESSION";
+  return "OFF SESSION";
 }
 
 function getWeekKey(){
@@ -473,28 +519,33 @@ function freshState(){
   return{
     weekKey:weekKey,
     statuses:["inactive","inactive","inactive","inactive","inactive"],
-    checks:Array.from({length:5},()=>Array(rules.length).fill(false))
+    checks:Array.from({length:5},()=>Array(flatRules.length).fill(false)),
+    triggers:Array.from({length:5},()=>Array(triggers.length).fill(false)),
+    responses:Array.from({length:5},()=>Array(responses.length).fill(false)),
+    sessionStarted:Array(5).fill(false)
   };
 }
 
 function loadState(){
-  let saved=localStorage.getItem("kaizenKnight");
+  let saved=localStorage.getItem("kaizenKnightV2");
   if(!saved) return freshState();
 
-  let parsed=JSON.parse(saved);
-  if(parsed.weekKey!==weekKey) return freshState();
-
-  return parsed;
+  try{
+    let parsed=JSON.parse(saved);
+    if(parsed.weekKey!==weekKey) return freshState();
+    return parsed;
+  }catch(e){
+    return freshState();
+  }
 }
 
 function saveState(){
-  localStorage.setItem("kaizenKnight",JSON.stringify(state));
+  localStorage.setItem("kaizenKnightV2",JSON.stringify(state));
 }
 
 function powerOn(){
   if(poweredOn) return;
   poweredOn=true;
-
   playBoot();
   showBoot();
 }
@@ -511,9 +562,32 @@ function renderDays(){
   }
 }
 
+function cleanCount(){
+  return state.statuses.filter(s=>s==="complete").length;
+}
+
+function failedCount(){
+  return state.statuses.filter(s=>s==="failed").length;
+}
+
+function perfectWeek(){
+  return cleanCount()===5 && failedCount()===0;
+}
+
+function growthStage(){
+  const clean=cleanCount();
+  if(clean<=0) return "·";
+  if(clean===1) return "◆";
+  if(clean===2) return "♣";
+  if(clean===3) return "♧";
+  if(clean===4) return "✦";
+  return "✹";
+}
+
 function getPetImage(type){
   if(type==="king") return "king.png";
   if(type==="rook") return "rook.png";
+  if(type==="angel") return "angel.png";
   return "knight.png";
 }
 
@@ -608,15 +682,7 @@ function showBoot(){
   },1200);
 }
 
-function showMain(fromBoot=false){
-  if(!poweredOn) return;
-
-  stopPet();
-  renderDays();
-
-  document.getElementById("screen").className="screen";
-  document.getElementById("statusBar").innerHTML="KAIZEN KNIGHT";
-
+function currentDayText(){
   let now=new Date();
 
   let timeString=now.toLocaleTimeString([],{
@@ -629,14 +695,29 @@ function showMain(fromBoot=false){
     day:'numeric'
   });
 
+  return {dateString,timeString};
+}
+
+function showMain(fromBoot=false){
+  if(!poweredOn) return;
+
+  stopPet();
+  renderDays();
+
+  document.getElementById("screen").className="screen";
+  document.getElementById("statusBar").innerHTML="KAIZEN KNIGHT";
+
+  let dt=currentDayText();
+
   if(todayIndex<0){
     document.getElementById("playArea").innerHTML=
+      "<div class='growth'>"+growthStage()+"</div>"+
       petHTML("knight")+
       "<div class='ground'></div>"+
       "<div class='textbox'>"+
-      dateString+" • "+timeString+
-      "<br>WEEKEND"+
-      "<br>REST DAY"+
+      dt.dateString+" • "+dt.timeString+
+      "<br>WEEKEND / REST DAY"+
+      "<br><span class='subline'>CLEAN DAYS: "+cleanCount()+"/5</span>"+
       "</div>";
 
     startPet(fromBoot ? 650 : 0);
@@ -644,12 +725,13 @@ function showMain(fromBoot=false){
   }
 
   let status=state.statuses[todayIndex];
-  let text="STEADY";
+  let session=state.sessionStarted[todayIndex];
+  let text=session ? "SESSION ACTIVE" : "STEADY";
   let petType="knight";
 
   if(status==="complete"){
     text="DAY LOCKED CLEAN";
-    petType="king";
+    petType=perfectWeek() ? "angel" : "king";
   }
 
   if(status==="failed"){
@@ -658,18 +740,19 @@ function showMain(fromBoot=false){
   }
 
   document.getElementById("playArea").innerHTML=
+    "<div class='growth'>"+growthStage()+"</div>"+
     petHTML(petType)+
     "<div class='ground'></div>"+
     "<div class='textbox'>"+
-    dateString+" • "+timeString+
-    "<br>"+days[todayIndex]+
-    "<br>STATUS: "+text+
+    dt.dateString+" • "+days[todayIndex]+
+    "<br>"+getSessionName()+" / "+text+
+    "<br><span class='subline'>CLEAN DAYS: "+cleanCount()+"/5</span>"+
     "</div>";
 
   startPet(fromBoot ? 650 : 0);
 }
 
-function showChecklist(){
+function showVows(){
   if(!poweredOn) return;
 
   stopPet();
@@ -681,22 +764,52 @@ function showChecklist(){
 
   playMenu();
 
-  let checks=state.checks[todayIndex];
-
   let html="";
   html+="<div class='checklist-wrapper'>";
-  html+="<div class='check-title'>"+shortDays[todayIndex]+" VOW</div>";
+  html+="<div class='check-title'>"+shortDays[todayIndex]+" VOWS</div>";
   html+="<div class='checklist' id='checklist'>";
 
-  for(let i=0;i<rules.length;i++){
+  let flatIndex=0;
+
+  for(let g=0;g<vowGroups.length;g++){
+    html+="<div class='section-label'>"+vowGroups[g].name+"</div>";
+
+    for(let r=0;r<vowGroups[g].rules.length;r++){
+      const checked=state.checks[todayIndex][flatIndex];
+      html+="<div class='rule'>";
+      html+="<div class='box "+(checked?"checked":"")+"' id='box"+flatIndex+"' onclick='toggleRule("+flatIndex+")'></div>";
+      html+="<div>"+vowGroups[g].rules[r]+"</div>";
+      html+="</div>";
+      flatIndex++;
+    }
+  }
+
+  html+="<div class='section-label'>TRIGGERS</div>";
+  html+="<div class='small-note'>ONLY MARK IF IT HAPPENED</div>";
+
+  for(let i=0;i<triggers.length;i++){
+    const checked=state.triggers[todayIndex][i];
     html+="<div class='rule'>";
-    html+="<div class='box "+(checks[i]?"checked":"")+"' id='box"+i+"' onclick='toggleRule("+i+")'></div>";
-    html+="<div>"+rules[i]+"</div>";
+    html+="<div class='box "+(checked?"checked":"")+"' id='trigger"+i+"' onclick='toggleTrigger("+i+")'></div>";
+    html+="<div>"+triggers[i]+"</div>";
     html+="</div>";
+  }
+
+  if(anyTrigger()){
+    html+="<div class='section-label'>RESPONSE</div>";
+
+    for(let i=0;i<responses.length;i++){
+      const checked=state.responses[todayIndex][i];
+      html+="<div class='rule'>";
+      html+="<div class='box "+(checked?"checked":"")+"' id='response"+i+"' onclick='toggleResponse("+i+")'></div>";
+      html+="<div>"+responses[i]+"</div>";
+      html+="</div>";
+    }
   }
 
   html+="</div>";
   html+="<div class='check-buttons'>";
+  html+="<button class='mini-btn' onclick='startSession()'>START</button>";
   html+="<button class='mini-btn' onclick='lockInDay()'>LOCK</button>";
   html+="<button class='mini-btn' onclick='showMain()'>BACK</button>";
   html+="</div>";
@@ -705,27 +818,67 @@ function showChecklist(){
   document.getElementById("playArea").innerHTML=html;
 }
 
+function anyTrigger(){
+  if(todayIndex<0) return false;
+  return state.triggers[todayIndex].some(Boolean);
+}
+
 function toggleRule(index){
   state.checks[todayIndex][index]=!state.checks[todayIndex][index];
   saveState();
 
   let box=document.getElementById("box"+index);
-
-  if(box){
-    box.classList.toggle("checked",state.checks[todayIndex][index]);
-  }
+  if(box) box.classList.toggle("checked",state.checks[todayIndex][index]);
 
   playTick();
 }
 
+function toggleTrigger(index){
+  state.triggers[todayIndex][index]=!state.triggers[todayIndex][index];
+
+  if(!anyTrigger()){
+    state.responses[todayIndex]=Array(responses.length).fill(false);
+  }
+
+  saveState();
+  playTick();
+  showVows();
+}
+
+function toggleResponse(index){
+  state.responses[todayIndex][index]=!state.responses[todayIndex][index];
+  saveState();
+
+  let box=document.getElementById("response"+index);
+  if(box) box.classList.toggle("checked",state.responses[todayIndex][index]);
+
+  playTick();
+}
+
+function startSession(){
+  if(todayIndex<0) return;
+  state.sessionStarted[todayIndex]=true;
+  saveState();
+  playMenu();
+  showMain();
+}
+
 function lockInDay(){
-  if(!poweredOn) return;
+  if(!poweredOn || todayIndex<0) return;
 
   stopPet();
 
-  let checks=state.checks[todayIndex];
-  let total=checks.filter(Boolean).length;
-  let passed=total===rules.length;
+  let total=state.checks[todayIndex].filter(Boolean).length;
+  let basePassed=total===flatRules.length;
+
+  let triggerHappened=anyTrigger();
+  let responsePassed=true;
+
+  if(triggerHappened){
+    responsePassed=state.responses[todayIndex].some(Boolean);
+  }
+
+  let passed=basePassed && responsePassed && !state.triggers[todayIndex][1];
 
   state.statuses[todayIndex]=passed?"complete":"failed";
   saveState();
@@ -736,37 +889,46 @@ function lockInDay(){
     playFailure();
   }
 
+  let petType=passed ? "king" : "rook";
+  if(passed && cleanCount()===5) petType="angel";
+
   document.getElementById("playArea").innerHTML=
-    petHTML(passed ? "king" : "rook")+
+    "<div class='growth'>"+growthStage()+"</div>"+
+    petHTML(petType)+
     "<div class='ground'></div>"+
     "<div class='textbox'>"+
-    "DAY LOCKED<br>"+total+"/10 RULES KEPT<br>"+
-    (passed ? "DISCIPLINE MAINTAINED" : "INTEGRITY DAMAGED")+
+    "DAY LOCKED<br>"+
+    total+"/"+flatRules.length+" VOWS KEPT<br>"+
+    (passed ? "INTEGRITY PRESERVED" : "INTEGRITY DAMAGED")+
     "</div>";
 
   renderDays();
   startPet();
 }
 
-function showWeek(){
+function showStatus(){
   if(!poweredOn) return;
 
   stopPet();
-
   playMenu();
   renderDays();
 
-  let clean=state.statuses.filter(s=>s==="complete").length;
-  let failed=state.statuses.filter(s=>s==="failed").length;
-  let active=state.statuses.filter(s=>s!=="inactive").length;
+  let activeDays=state.statuses.filter(s=>s!=="inactive").length;
+  let clean=cleanCount();
+  let failed=failedCount();
+
+  let message="CHAIN UNBROKEN";
+  if(failed>0) message="CHAIN BROKEN";
+  if(clean===5 && failed===0) message="ANGEL WEEK";
 
   document.getElementById("playArea").innerHTML=
-    petHTML("knight")+
+    "<div class='growth'>"+growthStage()+"</div>"+
+    petHTML(perfectWeek() ? "angel" : "knight")+
     "<div class='ground'></div>"+
     "<div class='textbox'>"+
-    "WEEK "+weekKey+"<br>"+
-    "CLEAN:"+clean+" FAILED:"+failed+"<br>"+
-    "ACTIVE DAYS:"+active+
+    "WEEK OF "+weekKey+
+    "<br>CLEAN:"+clean+" FAILED:"+failed+
+    "<br><span class='subline'>"+message+" / ACTIVE:"+activeDays+"</span>"+
     "</div>";
 
   startPet();
@@ -776,7 +938,6 @@ function resetWeek(){
   if(!poweredOn) return;
 
   stopPet();
-
   playReset();
   state=freshState();
   saveState();
