@@ -99,8 +99,8 @@
     }
 
     .pet-zone{
-      width:180px;
-      height:78px;
+      width:220px;
+      height:130px;
       position:relative;
       margin-bottom:8px;
     }
@@ -117,14 +117,15 @@
     }
 
     .knight-img{
-      width:64px;
-      height:64px;
+      width:128px;
+      height:128px;
       display:block;
       image-rendering:pixelated;
       image-rendering:crisp-edges;
+      -ms-interpolation-mode:nearest-neighbor;
       object-fit:contain;
-      opacity:.9;
-      filter:grayscale(1) contrast(1.8) brightness(.65);
+      opacity:.92;
+      filter:grayscale(1) contrast(2) brightness(.55);
     }
 
     .pet-walker.right .knight-img{
@@ -511,7 +512,7 @@ function petHTML(){
     <div class="pet-zone">
       <div class="pet-walker left" id="petWalker">
         <div class="pet-bob">
-          <img class="knight-img" src="knight.png" alt="Kaizen Knight">
+          <img class="knight-img" src="knight.PNG" alt="Kaizen Knight">
         </div>
       </div>
     </div>
