@@ -243,11 +243,18 @@ function loadState(){
 
   try{
     let parsed=JSON.parse(saved);
-    if(parsed.weekKey!==weekKey) return freshState();
+
+    if(parsed.weekKey!==weekKey){
+      let newState=freshState();
+      newState.streak=typeof parsed.streak==="number" ? parsed.streak : 0;
+      return newState;
+    }
+
     if(!parsed.sundayVows || parsed.sundayVows.length!==sundayVows.length) return freshState();
     if(!parsed.weekdayVows || parsed.weekdayVows[1].length!==weekdayVows.length) return freshState();
     if(!parsed.damage || parsed.damage[0].length!==damageStates.length) return freshState();
     if(typeof parsed.streak!=="number") parsed.streak=cleanCountFromStatuses(parsed.statuses);
+
     return parsed;
   }catch(e){
     return freshState();
@@ -629,7 +636,12 @@ function lockDay(){
 function resetWeek(){
   play("reset");
   stopFirework();
+
+  let savedStreak=state.streak;
+
   state=freshState();
+  state.streak=savedStreak;
+
   saveState();
   showMain();
 }
