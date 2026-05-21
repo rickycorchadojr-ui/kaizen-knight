@@ -67,7 +67,7 @@
       overflow-x:auto;
       overflow-y:hidden;
       white-space:nowrap;
-      background:#e9ecd8;
+      background:#f8f8f8;
       box-sizing:border-box;
       scroll-snap-type:none;
       -webkit-overflow-scrolling:touch;
@@ -80,7 +80,9 @@
       height:100%;
       box-sizing:border-box;
       position:relative;
-      background:#e9ecd8;
+      background:#f8f8f8 url("gallery_bg.png") center/cover no-repeat;
+      image-rendering:pixelated;
+      image-rendering:crisp-edges;
       justify-content:center;
       align-items:flex-end;
       padding:18px 18px 20px;
@@ -130,17 +132,6 @@
       line-height:1;
       color:#777;
       margin-bottom:0;
-    }
-
-    .gallery-floor{
-      position:absolute;
-      left:0;
-      right:0;
-      bottom:0;
-      height:42px;
-      border-top:4px solid #111;
-      background:#d8d0b0;
-      z-index:1;
     }
 
     .gallery-footer{font-size:19px;text-align:center;border-top:4px solid #111;padding:4px;background:#f8f8f8;}
@@ -241,9 +232,7 @@ const sounds={};
 
 function requirePower(){ return poweredOn; }
 
-function getTodaysVows(){
-  return todayIndex===0 ? sundayVows : weekdayVows;
-}
+function getTodaysVows(){ return todayIndex===0 ? sundayVows : weekdayVows; }
 
 function getSceneImage(){
   if(state.streak>=35) return "scene6.png";
@@ -256,16 +245,8 @@ function getSceneImage(){
   return "bgtest.png";
 }
 
-function sceneBackgroundHTML(){
-  return "<img class='scene-bg' src='"+getSceneImage()+"'>";
-}
-
-function ufoHTML(){
-  if(state.streak>=35){
-    return "<img class='ufo' src='ufo.png'>";
-  }
-  return "";
-}
+function sceneBackgroundHTML(){ return "<img class='scene-bg' src='"+getSceneImage()+"'>"; }
+function ufoHTML(){ return state.streak>=35 ? "<img class='ufo' src='ufo.png'>" : ""; }
 
 function getAchievementDays(){
   let arr=[];
@@ -288,7 +269,6 @@ function formatToday(){
 
 function ensureAchievementArchive(){
   if(!state.achievements) state.achievements={};
-
   let changed=false;
   const days=getAchievementDays();
 
@@ -306,18 +286,13 @@ function ensureAchievementArchive(){
 function recordAchievement(day){
   if(!isAchievementDay(day)) return;
   if(!state.achievements) state.achievements={};
-  if(!state.achievements[day]){
-    state.achievements[day]=formatToday();
-  }
+  if(!state.achievements[day]) state.achievements[day]=formatToday();
 }
 
 function makeToneSequenceWav(sequence){
   const sampleRate=22050;
   let totalSamples=0;
-
-  for(let i=0;i<sequence.length;i++){
-    totalSamples+=Math.floor(sampleRate*sequence[i].duration);
-  }
+  for(let i=0;i<sequence.length;i++) totalSamples+=Math.floor(sampleRate*sequence[i].duration);
 
   const dataSize=totalSamples*2;
   const buffer=new ArrayBuffer(44+dataSize);
@@ -351,14 +326,12 @@ function makeToneSequenceWav(sequence){
 
     for(let i=0;i<samples;i++){
       let sample=0;
-
       if(freq>0){
         const t=i/sampleRate;
         const square=Math.sin(2*Math.PI*freq*t)>=0?1:-1;
         const fade=1-(i/samples);
         sample=square*volume*fade*32767;
       }
-
       view.setInt16(44+sampleIndex*2,sample,true);
       sampleIndex++;
     }
@@ -467,19 +440,14 @@ function loadState(){
   }
 }
 
-function saveState(){
-  localStorage.setItem("kaizenKnightV5",JSON.stringify(state));
-}
+function saveState(){ localStorage.setItem("kaizenKnightV5",JSON.stringify(state)); }
 
 function cleanCountFromStatuses(statuses){
   if(!statuses) return 0;
   return statuses.filter(s=>s==="complete").length;
 }
 
-function getVowStateForToday(){
-  if(todayIndex===0) return state.sundayVows;
-  return state.weekdayVows[todayIndex];
-}
+function getVowStateForToday(){ return todayIndex===0 ? state.sundayVows : state.weekdayVows[todayIndex]; }
 
 function getPetImage(type){
   if(type==="king") return "king.png";
@@ -497,29 +465,12 @@ function getPetImage(type){
 }
 
 function isCleanSprite(type){
-  return type==="angel" ||
-         type==="red" ||
-         type==="orange" ||
-         type==="yellow" ||
-         type==="green" ||
-         type==="blue" ||
-         type==="purple" ||
-         type==="black" ||
-         type==="brown";
+  return type==="angel" || type==="red" || type==="orange" || type==="yellow" || type==="green" || type==="blue" || type==="purple" || type==="black" || type==="brown";
 }
 
-function getPetClass(type){
-  if(isCleanSprite(type)) return "pet-img clean-img";
-  return "pet-img";
-}
-
-function streakHTML(){
-  return "<div class='streak-counter'>"+state.streak+"</div>";
-}
-
-function achievementHTML(){
-  return "<div class='achievement-banner' id='achievementBanner'></div>";
-}
+function getPetClass(type){ return isCleanSprite(type) ? "pet-img clean-img" : "pet-img"; }
+function streakHTML(){ return "<div class='streak-counter'>"+state.streak+"</div>"; }
+function achievementHTML(){ return "<div class='achievement-banner' id='achievementBanner'></div>"; }
 
 function petHTML(type="knight"){
   return `
@@ -559,16 +510,11 @@ function startFirework(){
 
   fireworkTimer=setInterval(()=>{
     fireworkFrame++;
-
     if(fireworkFrame>12){
       stopFirework();
       return;
     }
-
-    if(fireworkFrame===5 || fireworkFrame===9){
-      play("firework");
-    }
-
+    if(fireworkFrame===5 || fireworkFrame===9) play("firework");
     fw.src="Firework"+fireworkFrame+".png";
   },500);
 }
@@ -626,7 +572,6 @@ function renderDays(){
   for(let i=0;i<6;i++){
     let el=document.getElementById("day"+i);
     el.className="day";
-
     if(state.statuses[i]==="complete") el.classList.add("complete");
     if(state.statuses[i]==="failed") el.classList.add("failed");
     if(state.statuses[i]==="inactive") el.classList.add("inactive");
@@ -670,9 +615,7 @@ function formFromWeeklyPercent(percent){
   return null;
 }
 
-function shouldShowFinalForm(){
-  return state.finalForm && (todayIndex===5 || todayIndex===-1);
-}
+function shouldShowFinalForm(){ return state.finalForm && (todayIndex===5 || todayIndex===-1); }
 
 function powerOn(){
   if(poweredOn) return;
@@ -683,13 +626,10 @@ function powerOn(){
 
 function showBoot(){
   renderDays();
-
   document.getElementById("screen").className="screen boot-dark";
   document.getElementById("statusBar").innerHTML="POWER";
   document.getElementById("playArea").innerHTML="<div class='boot-text'>BOOTING...</div>";
-
   setTimeout(()=>{ document.getElementById("statusBar").innerHTML="KAIZEN KNIGHT"; },650);
-
   setTimeout(()=>{
     document.getElementById("screen").className="screen";
     showMain(true);
@@ -716,12 +656,10 @@ function showMain(fromBoot=false){
     status=state.finalForm==="angel" ? "PERFECT WEEK" : "WEEK FORM";
   }else if(todayIndex>=0){
     status="STEADY";
-
     if(state.statuses[todayIndex]==="complete"){
       status="DAY SEALED CLEAN";
       petType="king";
     }
-
     if(state.statuses[todayIndex]==="failed"){
       status="INTEGRITY DAMAGED";
       petType="rook";
@@ -762,7 +700,6 @@ function showCheck(restoreScroll=null){
   html+="<div class='panel'>";
   html+="<div class='panel-title'>"+days[todayIndex]+" CHECK</div>";
   html+="<div class='scroll' id='checkScroll'>";
-
   html+="<div class='section-label'>VOWS</div>";
   html+="<div class='small-note'>CHECK WHAT HELD TRUE TODAY</div>";
 
@@ -816,9 +753,7 @@ function showCode(){
   html+="<div class='panel-title'>FIELD CODE</div>";
   html+="<div class='scroll'>";
 
-  for(let i=0;i<codeNotes.length;i++){
-    html+="<div class='note'>"+codeNotes[i]+"</div>";
-  }
+  for(let i=0;i<codeNotes.length;i++) html+="<div class='note'>"+codeNotes[i]+"</div>";
 
   html+="</div>";
   html+="<div class='panel-buttons'>";
@@ -849,7 +784,6 @@ function showGallery(){
     let earned=state.achievements && state.achievements[day];
 
     html+="<div class='gallery-room "+(earned?"":"locked")+"'>";
-    html+="<div class='gallery-floor'></div>";
     html+="<div class='trophy-display'>";
 
     html+="<div class='trophy-day'>DAY "+day+"</div>";
@@ -894,7 +828,6 @@ function toggleVow(i){
 
   let scrollTop=getCheckScrollTop();
   let vowState=getVowStateForToday();
-
   vowState[i]=!vowState[i];
 
   saveState();
@@ -906,7 +839,6 @@ function toggleDamage(i){
   if(!requirePower()) return;
 
   let scrollTop=getCheckScrollTop();
-
   state.damage[todayIndex][i]=!state.damage[todayIndex][i];
 
   saveState();
@@ -1010,13 +942,8 @@ function lockDay(){
 
   startPet();
 
-  if(shouldPlayFirework){
-    setTimeout(()=>startFirework(),450);
-  }
-
-  if(newRecord && newAchievement){
-    setTimeout(()=>showAchievementBanner(state.streak),650);
-  }
+  if(shouldPlayFirework) setTimeout(()=>startFirework(),450);
+  if(newRecord && newAchievement) setTimeout(()=>showAchievementBanner(state.streak),650);
 }
 
 buildSounds();
