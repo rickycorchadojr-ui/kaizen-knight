@@ -20,8 +20,10 @@
     .status-bar{height:38px;border-bottom:4px solid #111;display:flex;justify-content:center;align-items:center;font-size:24px;letter-spacing:2px;flex-shrink:0;}
     .off .status-bar,.boot-dark .status-bar{color:#e9ecd8;border-bottom:4px solid #e9ecd8;}
     .play-area{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;align-items:center;box-sizing:border-box;overflow:hidden;position:relative;}
-    .scene-bg{position:absolute;left:50%;bottom:88px;width:320px;height:auto;transform:translateX(-50%);object-fit:contain;image-rendering:pixelated;image-rendering:crisp-edges;z-index:1;pointer-events:none;}
-    .ufo{position:absolute;top:52px;left:0;width:64px;height:auto;image-rendering:pixelated;image-rendering:crisp-edges;pointer-events:none;z-index:2;animation:ufoFly 60s linear infinite;}
+
+.scene-bg{position:absolute;left:50%;bottom:88px;width:320px;height:auto;transform:translateX(-50%);object-fit:contain;image-rendering:pixelated;image-rendering:crisp-edges;z-index:1;pointer-events:none;}
+.halloween-overlay{position:absolute;left:50%;bottom:88px;width:320px;height:auto;transform:translateX(-50%);object-fit:contain;image-rendering:pixelated;image-rendering:crisp-edges;z-index:2;pointer-events:none;}
+.ufo{position:absolute;top:52px;left:0;width:64px;height:auto;image-rendering:pixelated;image-rendering:crisp-edges;pointer-events:none;z-index:3;animation:ufoFly 60s linear infinite;}
     @keyframes ufoFly{0%{transform:translateX(-90px);}100%{transform:translateX(410px);}}
     .achievement-banner{position:absolute;top:0;left:50%;transform:translate(-50%,-120%);background:#111;color:#f8f8f8;border:4px solid #f8f8f8;font-size:30px;line-height:1;padding:7px 18px;z-index:20;white-space:nowrap;letter-spacing:2px;pointer-events:none;}
     .achievement-banner.show{animation:achievementDrop 2.05s forwards;}
@@ -31,7 +33,8 @@
     .power-author{display:block;margin-top:10px;font-size:22px;}
     .boot-text{color:#e9ecd8;font-size:32px;letter-spacing:2px;animation:bootPulse .8s infinite steps(2);}
     @keyframes bootPulse{0%{opacity:1}50%{opacity:.35}100%{opacity:1}}
-    .pet-zone{width:240px;height:130px;position:relative;margin-bottom:-10px;z-index:2;}
+
+.pet-zone{width:240px;height:130px;position:relative;margin-bottom:-10px;z-index:4;}
     .pet-walker{position:absolute;left:50%;bottom:28px;transform:translateX(-50%);}
     .pet-bob{animation:bob 1.2s infinite steps(2);position:relative;width:160px;height:160px;}
     .pet-img{width:160px;height:160px;display:block;image-rendering:pixelated;image-rendering:crisp-edges;object-fit:contain;opacity:.92;filter:grayscale(1) contrast(2) brightness(.55);}
@@ -182,6 +185,8 @@ function getSceneImage(){
   return "bgtest.png";
 }
 function sceneBackgroundHTML(){ return "<img class='scene-bg' src='"+getSceneImage()+"'>"; }
+function isOctober(){ return new Date().getMonth()===9; }
+function halloweenHTML(){ return isOctober() ? "<img class='halloween-overlay' src='Halloween.png'>" : ""; }
 function ufoHTML(){ return state.streak>=35 ? "<img class='ufo' src='ufo.png'>" : ""; }
 function getAchievementDays(){
   let arr=[];
@@ -695,11 +700,14 @@ function showMain(fromBoot=false){
     }
   }
   document.getElementById("playArea").innerHTML=
-    achievementHTML()+
-    streakHTML()+
-    sceneBackgroundHTML()+
-    ufoHTML()+
-    petHTML(petType)+
+
+achievementHTML()+
+streakHTML()+
+sceneBackgroundHTML()+
+halloweenHTML()+
+ufoHTML()+
+petHTML(petType)+
+
     "<div class='ground'></div>"+
     "<div class='textbox'>"+
     weekText+
