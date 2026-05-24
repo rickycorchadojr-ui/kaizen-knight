@@ -55,6 +55,7 @@ body{margin:0;height:100vh;background:#111;display:flex;justify-content:center;a
 .ground{width:100px;border-bottom:4px solid #111;margin-bottom:14px;position:relative;z-index:2;}
 .textbox{width:100%;background:#f8f8f8;border-top:4px solid #111;padding:9px;box-sizing:border-box;text-align:center;font-size:24px;line-height:1.03;position:relative;z-index:3;}
 .subline{font-size:20px;opacity:.9;}
+.version-line{font-size:16px;opacity:.55;margin-top:2px;}
 .panel{width:100%;height:100%;display:flex;flex-direction:column;background:#f8f8f8;}
 .panel-title{text-align:center;font-size:25px;padding:5px;border-bottom:4px solid #111;flex-shrink:0;}
 .scroll{flex:1;overflow-y:auto;padding:8px 10px;box-sizing:border-box;}
@@ -200,6 +201,7 @@ const manualNotes=[
   ["RISK SETTINGS REMOVED","DAMAGE: SAFETY WAS UNLOCKED."],
   ["BOUGHT / RESET COMBINE","DAMAGE: PAID TO CONTINUE THE LOOP."]
 ];
+const APP_VERSION="5.3.0";
 const days=["SUNDAY","MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY"];
 let todayIndex=getTradingDayIndex();
 let weekKey=getWeekKey();
@@ -299,21 +301,28 @@ function formatToday(){
 }
 function ensureAchievementArchive(){
   if(!state.achievements) state.achievements={};
+
   let changed=false;
-  const days=getAchievementDays();
-  for(let i=0;i<days.length;i++){
-    let d=days[i];
-    if(d<=state.bestStreak && !state.achievements[d]){
-      state.achievements[d]="PAST RECORD";
+
+  for(let key in state.achievements){
+    if(state.achievements[key]==="PAST RECORD"){
+      state.achievements[key]="DATE UNKNOWN";
       changed=true;
     }
   }
+
   if(changed) saveState();
 }
 function recordAchievement(day){
-  if(!isAchievementDay(day)) return;
+  if(!isAchievementDay(day)) return false;
   if(!state.achievements) state.achievements={};
-  if(!state.achievements[day]) state.achievements[day]=formatToday();
+
+  if(!state.achievements[day] || state.achievements[day]==="DATE UNKNOWN" || state.achievements[day]==="PAST RECORD"){
+    state.achievements[day]=formatToday();
+    return true;
+  }
+
+  return false;
 }
 function makeToneSequenceWav(sequence){
   const sampleRate=22050;
@@ -881,7 +890,9 @@ petHTML(petType)+
     "<div class='ground'></div>"+
     "<div class='textbox'>"+
     weekText+
-    "<br><span class='subline'>CLEAN DAYS: "+cleanCount()+"/6</span>"+    "</div>";
+    "<br><span class='subline'>CLEAN DAYS: "+cleanCount()+"/6</span>"+
+"<div class='version-line'>VER "+APP_VERSION+"</div>"+
+"</div>";
   startPet(fromBoot ? 650 : 0);
 }
 function showCheck(restoreScroll=null){
@@ -1153,19 +1164,20 @@ if(!wasAlreadyLocked){
 }
   let newRecord=false;
   let newAchievement=false;
-  if(passed){
-    state.streak++;
-    if(state.streak>state.bestStreak && state.streak<=365){
-      state.bestStreak=state.streak;
-      newRecord=true;
-      if(isAchievementDay(state.streak)){
-        recordAchievement(state.streak);
-        newAchievement=true;
-      }
-    }
-  }else{
-    state.streak=0;
+if(passed){
+  state.streak++;
+
+  if(recordAchievement(state.streak)){
+    newAchievement=true;
   }
+
+  if(state.streak>state.bestStreak && state.streak<=365){
+    state.bestStreak=state.streak;
+    newRecord=true;
+  }
+}else{
+  state.streak=0;
+}
   let shouldPlayFirework=passed && todayIndex===5 && perfectWeek();
   let weeklyForm=null;
   if(todayIndex===5){
