@@ -21,7 +21,18 @@
   <style>
 body{margin:0;height:100vh;background:#111;display:flex;justify-content:center;align-items:center;font-family:'VT323',monospace;overflow:hidden;-webkit-user-select:none;user-select:none;touch-action:manipulation;}
 .device{width:min(92vw,420px);height:min(86vh,740px);background:#ECECEC;border:6px solid #777;border-radius:32px;padding:18px 24px 24px;box-sizing:border-box;box-shadow:0 8px 0 #555;}
-.device-title{text-align:center;color:#D93831;font-family:'Radeil',sans-serif;font-size:34px;line-height:1;margin:4px 0 12px;letter-spacing:1px;}.screen{width:100%;height:62%;background:#e9ecd8;border:10px solid #346245;border-radius:18px;display:flex;flex-direction:column;overflow:hidden;box-sizing:border-box;}
+.device-title{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  margin:2px 0 10px;
+}
+
+.title-logo{
+  width:260px;
+  height:auto;
+  display:block;
+}.screen{width:100%;height:62%;background:#e9ecd8;border:10px solid #346245;border-radius:18px;display:flex;flex-direction:column;overflow:hidden;box-sizing:border-box;}
 .screen.off,.screen.boot-dark{background:#111;}
 .status-bar{height:38px;border-bottom:4px solid #111;display:flex;justify-content:center;align-items:center;font-size:24px;letter-spacing:2px;flex-shrink:0;}
 .off .status-bar,.boot-dark .status-bar{color:#e9ecd8;border-bottom:4px solid #e9ecd8;}
@@ -131,7 +142,9 @@ body{margin:0;height:100vh;background:#111;display:flex;justify-content:center;a
 </head>
 <body>
 <div class="device">
-  <div class="device-title">kaizen knight</div>
+  <div class="device-title">
+  <img src="logo.png" class="title-logo">
+</div>
   <div class="screen off" id="screen">
     <div class="status-bar" id="statusBar">POWER OFF</div>
     <div class="play-area" id="playArea">
