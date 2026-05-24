@@ -57,12 +57,13 @@ body{margin:0;height:100vh;background:#111;display:flex;justify-content:center;a
 .subline{font-size:20px;opacity:.9;}
 .version-line{
   position:absolute;
-  right:18px;
-  bottom:8px;
+  right:14px;
+  bottom:4px;
   font-size:13px;
-  opacity:.38;
+  opacity:.32;
   letter-spacing:1px;
   pointer-events:none;
+  z-index:6;
 }
 .panel{width:100%;height:100%;display:flex;flex-direction:column;background:#f8f8f8;}
 .panel-title{text-align:center;font-size:25px;padding:5px;border-bottom:4px solid #111;flex-shrink:0;}
@@ -163,7 +164,7 @@ body{margin:0;height:100vh;background:#111;display:flex;justify-content:center;a
     </div>
   </div>
 
-  <div class="version-line">VER 5.3.0</div>
+
 
 </div>
 <script>
@@ -901,8 +902,9 @@ petHTML(petType)+
     "<div class='ground'></div>"+
     "<div class='textbox'>"+
     weekText+
-    "<br><span class='subline'>CLEAN DAYS: "+cleanCount()+"/6</span>"+
-"</div>";
+ "<br><span class='subline'>CLEAN DAYS: "+cleanCount()+"/6</span>"+
+"</div>"+
+"<div class='version-line'>VER "+APP_VERSION+"</div>";
   startPet(fromBoot ? 650 : 0);
 }
 function showCheck(restoreScroll=null){
