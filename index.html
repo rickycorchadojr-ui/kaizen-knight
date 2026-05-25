@@ -325,7 +325,7 @@ const UFO_MIN_DURATION=42;
 const UFO_MAX_DURATION=78;
 const UFO_MAX_DELAY=18;
 
-const PLANE_CHANCE=800;
+const PLANE_CHANCE=1200;
 
 const PLANE_MIN_DURATION=34;
 const PLANE_MAX_DURATION=64;
@@ -411,7 +411,16 @@ function ufoHTML(){
 }
 
 function planeHTML(){
-  return "<div class='sky-object plane-object fly-right' style='--sky-top:5px;--sky-duration:24s;--sky-delay:0s;'><img class='sky-img' id='planeImg' src='./Plane1.png'></div>";
+  if(Math.floor(Math.random()*PLANE_CHANCE)!==0){
+    return "";
+  }
+
+  const dir=randDirection();
+  const top=Math.floor(randRange(2,18));
+  const duration=randRange(22,34).toFixed(2);
+  const delay=randRange(0,6).toFixed(2);
+
+  return "<div class='sky-object plane-object fly-"+dir+"' style='"+skyStyle(top,duration,delay)+"'><img class='sky-img' id='planeImg' src='./Plane1.png'></div>";
 }
 
 function startSkyAnimations(){
