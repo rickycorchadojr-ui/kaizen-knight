@@ -45,7 +45,7 @@ body{margin:0;height:100vh;background:#111;display:flex;justify-content:center;a
 position:absolute;
 top:var(--sky-top);
 left:0;
-width:110px;
+width:64px;
 height:auto;
 image-rendering:pixelated;
 image-rendering:crisp-edges;
@@ -405,7 +405,7 @@ function ufoHTML(){
 }
 
 function planeHTML(){
-  return "<div style='position:absolute;top:50px;left:80px;z-index:99;background:white;border:3px solid red;width:147px;height:80px;'><img id='planeImg' src='./Plane1.png' style='width:147px;height:80px;image-rendering:pixelated;' onerror=\"document.getElementById('statusBar').innerHTML='PLANE PNG MISSING'\"></div>";
+  return "<div class='sky-object fly-right' style='--sky-top:50px;--sky-duration:4s;--sky-delay:0s;'><img class='sky-img' id='planeImg' src='./Plane1.png'></div>";
 }
 
 function startSkyAnimations(){
