@@ -276,7 +276,7 @@ const manualNotes=[
   ["RISK SETTINGS REMOVED","DAMAGE: SAFETY WAS UNLOCKED."],
   ["BOUGHT / RESET COMBINE","DAMAGE: PAID TO CONTINUE THE LOOP."]
 ];
-const APP_VERSION="6.0.0";
+const APP_VERSION="6.0.1";
 const DEBUG_MODE=false;
 const days=["SUNDAY","MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY"];
 let todayIndex=getTradingDayIndex();
@@ -786,6 +786,33 @@ function saveState(){ localStorage.setItem("kaizenKnightV5",JSON.stringify(state
 function cleanCountFromStatuses(statuses){
   if(!statuses) return 0;
   return statuses.filter(s=>s==="complete").length;
+}
+function repairWeeklyStatusesFromChecklist(){
+
+  if(!state.statuses || state.statuses.length!==6){
+    state.statuses=["inactive","inactive","inactive","inactive","inactive","inactive"];
+  }
+
+  for(let d=0;d<6;d++){
+
+    let vows = d===0 ? state.sundayVows : state.weekdayVows[d];
+    let damage = state.damage[d];
+
+    if(!vows || !damage) continue;
+
+    let anyVowChecked=vows.some(v=>v);
+    let anyDamageChecked=damage.some(v=>v);
+
+    if(!anyVowChecked && !anyDamageChecked) continue;
+
+    let allVowsChecked=vows.every(v=>v);
+
+    if(allVowsChecked && !anyDamageChecked){
+      state.statuses[d]="complete";
+    }else{
+      state.statuses[d]="failed";
+    }
+  }
 }
 function getVowStateForToday(){ return todayIndex===0 ? state.sundayVows : state.weekdayVows[todayIndex]; }
 function getPetImage(type){
@@ -1614,8 +1641,9 @@ state.weekKey=weekKey;
     if(!state.records) state.records=[];
     if(!state.vault) state.vault=createFreshVault();
 
-    ensureVault();
-    saveState();
+ensureVault();
+repairWeeklyStatusesFromChecklist();
+saveState();
 
     play("good");
 
