@@ -363,7 +363,7 @@ const powerQuotes=[
     weight:15
   }
 ];
-const APP_VERSION="7.0.2";
+const APP_VERSION="7.0.3";
 const DEBUG_MODE=false;
 const days=["SUNDAY","MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY"];
 let todayIndex=getTradingDayIndex();
@@ -614,6 +614,25 @@ function logRecoveryDay(){
     dayKey:dayKey,
     date:formatToday()
   });
+}
+function awardRecoveryDay(){
+  if(todayIndex<0) return;
+  if(state.statuses[todayIndex]!=="inactive") return;
+
+  state.statuses[todayIndex]="recovery";
+  logRecoveryDay();
+
+  state.streak++;
+
+  if(recordAchievement(state.streak)){
+    // achievement is recorded silently here
+  }
+
+  if(state.streak>state.bestStreak && state.streak<=365){
+    state.bestStreak=state.streak;
+  }
+
+  state.crackActive=false;
 }
 
 function recoveryCountThisWeek(){
@@ -1490,14 +1509,18 @@ let status="REST DAY";
     status=state.finalForm==="angel" ? "PERFECT WEEK" : "WEEK FORM";
   }else if(todayIndex>=0){
     status="STEADY";
-    if(state.statuses[todayIndex]==="complete"){
-      status="DAY SEALED CLEAN";
-      petType="king";
-    }
-    if(state.statuses[todayIndex]==="failed"){
-      status="INTEGRITY DAMAGED";
-      petType="rook";
-    }
+if(state.statuses[todayIndex]==="complete"){
+  status="DAY SEALED CLEAN";
+  petType="king";
+}
+if(state.statuses[todayIndex]==="recovery"){
+  status="RECOVERY DAY";
+  petType="knight";
+}
+if(state.statuses[todayIndex]==="failed"){
+  status="INTEGRITY DAMAGED";
+  petType="rook";
+}
   }
 document.getElementById("statusBar").innerHTML=status;
   document.getElementById("playArea").innerHTML=
