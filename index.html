@@ -291,7 +291,8 @@ const gateQuestions=[
   "CAN WALK AWAY IF COMPROMISED"
 ];
 
-const GATE_FAIL_LIMIT=3;
+const GATE_LIGHT_LIMIT=5;
+const GATE_FAIL_LIMIT=8;
 const lightSessionVows=[
   "MAX SIZE 1",
   "ONE ACCOUNT ONLY",
@@ -378,7 +379,7 @@ const powerQuotes=[
     weight:15
   }
 ];
-const APP_VERSION="7.4.0";
+const APP_VERSION="7.6.0";
 const DEBUG_MODE=false;
 const days=["SUNDAY","MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY"];
 let todayIndex=getTradingDayIndex();
@@ -1890,11 +1891,6 @@ function showCheckRouter(){
     return;
   }
 
-  if(state.dayMode==="gate_failed"){
-    showGateFailedScreen();
-    return;
-  }
-
 if(state.dayMode==="recovery"){
   showRecoveryCheck();
   return;
@@ -1939,6 +1935,14 @@ for(let i=0;i<manualNotes.length;i++){
   html+="</div>";
 }
 
+html+="<div class='section-label'>MORNING GATE</div>";
+html+="<div class='small-note'>READINESS CHECK QUESTIONS</div>";
+
+for(let i=0;i<gateQuestions.length;i++){
+  html+="<div class='note'>";
+  html+="<div style='font-size:22px;'>"+(i+1)+". "+gateQuestions[i]+"</div>";
+  html+="</div>";
+}
 html+="<div class='section-label'>SAVE DATA</div>";
 html+="<div class='small-note'>BACK UP OR RESTORE YOUR KNIGHT</div>";
 
@@ -2021,19 +2025,25 @@ function submitGateTest(){
 
   state.gateCompleted=true;
 
-  if(missed>=GATE_FAIL_LIMIT){
-    state.dayMode="gate_failed";
-    state.gatePassed=false;
-    saveState();
-    play("fail");
-    showGateFailedScreen();
-    return;
-  }
+if(missed>=GATE_FAIL_LIMIT){
+  state.dayMode="recovery";
+  state.gatePassed=false;
+  state.recoveryChosen=true;
+  state.readinessScore=getReadinessScore();
+  state.readinessWeather="STORM";
+
+  awardRecoveryDay();
+
+  saveState();
+  play("fail");
+  showGateFailedScreen();
+  return;
+}
 
 state.gatePassed=true;
 state.readinessScore=getReadinessScore();
 
-if(missed===2){
+if(missed>=GATE_LIGHT_LIMIT){
   state.dayMode="light";
   state.readinessWeather="CLOUDY";
 }else{
@@ -2067,57 +2077,58 @@ function getReadinessWeather(score){
 function getReadinessMessage(weather){
   if(weather==="CLEAR") return "TODAY IS FAVORABLE FOR DECISIVE ACTION.";
   if(weather==="FAIR") return "TRADE WITH RESPECT. DO NOT FORCE.";
-  if(weather==="CLOUDY") return "MOVE SLOWLY. PROTECT CAPITAL.";
+  if(weather==="CLOUDY") return "LIGHT SESSION ADVISED. MOVE SLOWLY.";
   if(weather==="FOGGY") return "LIGHT SESSION ADVISED.";
   return "RECOVERY ADVISED. DO NOT TRADE.";
 }
-function showGatePassedScreen(){
-
-  const readiness=getReadinessScore();
-const weather=state.readinessWeather || getReadinessWeather(readiness);
-const message=getReadinessMessage(weather);
-const assignment=state.dayMode==="light" ? "LIGHT SESSION" : "NORMAL TRADE";
-
+function showGateReport(status, readiness, weather, assignment, message){
+  document.getElementById("screen").className="screen boot-dark";
   document.getElementById("statusBar").innerHTML="MORNING REPORT";
 
   document.getElementById("playArea").innerHTML=
-    "<div class='panel'>"+
-    "<div class='panel-title'>SUBJECT: TRADER</div>"+
-    "<div class='scroll' style='display:flex;align-items:center;justify-content:center;text-align:center;font-size:28px;line-height:1.05;'>"+
-    "STATUS: STABLE"+
+    "<div style='width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;color:#e9ecd8;background:#111;font-size:28px;line-height:1.05;'>"+
+    "<div>"+
+    "SUBJECT: TRADER"+
+    "<br><br>"+
+    "STATUS: "+status+
     "<br><br>"+
     "READINESS: "+readiness+"%"+
     "<br><br>"+
-"WEATHER: "+weather+
-"<br><br>"+
-"ASSIGNMENT:<br>"+assignment+
-"<br><br>"+
-"<span style='font-size:22px;'>"+message+"</span>"+
+    "WEATHER: "+weather+
+    "<br><br>"+
+    "ASSIGNMENT: "+assignment+
+    "<br><br>"+
+    "<span style='font-size:22px;'>"+message+"</span>"+
     "</div>"+
     "</div>";
 
-  setTimeout(()=>showMain(true),2200);
+  setTimeout(()=>{
+    document.getElementById("screen").className="screen";
+    showMain(true);
+  },2200);
+}
+
+function showGatePassedScreen(){
+  const readiness=getReadinessScore();
+  const weather=state.readinessWeather || getReadinessWeather(readiness);
+  const message=getReadinessMessage(weather);
+  const assignment=state.dayMode==="light" ? "LIGHT SESSION" : "NORMAL TRADE";
+
+  showGateReport("STABLE", readiness, weather, assignment, message);
 }
 
 function showGateFailedScreen(){
-  document.getElementById("statusBar").innerHTML="ACCESS DENIED";
+  const readiness=getReadinessScore();
 
-  document.getElementById("playArea").innerHTML=
-    "<div class='panel'>"+
-    "<div class='panel-title'>SUBJECT: TRADER</div>"+
-    "<div class='scroll' style='display:flex;align-items:center;justify-content:center;text-align:center;font-size:28px;line-height:1.05;'>"+
-    "STATUS: COMPROMISED"+
-    "<br><br>"+
-    "ASSIGNMENT: RECOVERY"+
-"<br><br>"+
-"<span style='font-size:22px;'>RECOVERY IS TRAINING.<br>DO. NOT. TRADE.</span>"+
-    "</div>"+
-    "<div class='panel-buttons'>"+
-    "<button class='mini-btn' onclick='convertGateFailToRecovery()'>RECOVERY</button>"+
-    "<button class='mini-btn' onclick='showMain()'>BACK</button>"+
-    "</div>"+
-    "</div>";
+  showGateReport(
+    "COMPROMISED",
+    readiness,
+    "STORM",
+    "RECOVERY",
+    "DO. NOT. TRADE."
+  );
 }
+
 function convertGateFailToRecovery(){
   if(!requirePower()) return;
 
