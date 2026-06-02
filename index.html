@@ -379,7 +379,7 @@ const powerQuotes=[
     weight:15
   }
 ];
-const APP_VERSION="7.7.1";
+const APP_VERSION="7.7.2";
 const DEBUG_MODE=false;
 const days=["SUNDAY","MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY"];
 let todayIndex=getTradingDayIndex();
@@ -485,8 +485,13 @@ function seasonalOverlayHTML(){
 }
 
 function getDayKey(){
-  return new Date().toISOString().slice(0,10);
+  const d=new Date();
+  const y=d.getFullYear();
+  const m=String(d.getMonth()+1).padStart(2,"0");
+  const day=String(d.getDate()).padStart(2,"0");
+  return y+"-"+m+"-"+day;
 }
+
 function rollPowerQuoteForToday(){
   const dayKey=getDayKey();
 
@@ -934,11 +939,15 @@ function getTradingDayIndex(){
   return -1;
 }
 function getWeekKey(){
-  let now=new Date();
-  let day=now.getDay();
-  let diff=now.getDate()-day;
-  let sunday=new Date(now.setDate(diff));
-  return sunday.toISOString().slice(0,10);
+  const now=new Date();
+  const sunday=new Date(now);
+  sunday.setDate(now.getDate()-now.getDay());
+
+  const y=sunday.getFullYear();
+  const m=String(sunday.getMonth()+1).padStart(2,"0");
+  const d=String(sunday.getDate()).padStart(2,"0");
+
+  return y+"-"+m+"-"+d;
 }
 const COPPER_PER_SILVER=50;
 const SILVER_PER_GOLD=10;
