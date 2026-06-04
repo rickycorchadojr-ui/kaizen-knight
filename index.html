@@ -409,7 +409,7 @@ const powerQuotes=[
     weight:15
   }
 ];
-const APP_VERSION="7.8.2";
+const APP_VERSION="7.8.3";
 const DEBUG_MODE=false;
 const days=["SUNDAY","MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY"];
 let todayIndex=getTradingDayIndex();
@@ -1081,6 +1081,7 @@ lifetimeDrills:0,
 trainingDays:0,
 trainingCompletedDays:0,
 trainingCompleteToday:false,
+trainingPromotedToday:false,
     achievements:{},
 records:[],
 recoveryLog:[],
@@ -1119,6 +1120,7 @@ newState.lifetimeDrills=typeof parsed.lifetimeDrills==="number" ? parsed.lifetim
 newState.trainingDays=typeof parsed.trainingDays==="number" ? parsed.trainingDays : 0;
 newState.trainingCompletedDays=typeof parsed.trainingCompletedDays==="number" ? parsed.trainingCompletedDays : 0;
 newState.trainingCompleteToday=typeof parsed.trainingCompleteToday==="boolean" ? parsed.trainingCompleteToday : false;
+newState.trainingPromotedToday=typeof parsed.trainingPromotedToday==="boolean" ? parsed.trainingPromotedToday : false;
 
 return newState;
     }
@@ -1155,6 +1157,7 @@ if(typeof parsed.lifetimeDrills==="undefined") parsed.lifetimeDrills=0;
 if(typeof parsed.trainingDays==="undefined") parsed.trainingDays=0;
 if(typeof parsed.trainingCompletedDays==="undefined") parsed.trainingCompletedDays=0;
 if(typeof parsed.trainingCompleteToday==="undefined") parsed.trainingCompleteToday=false;
+if(typeof parsed.trainingPromotedToday==="undefined") parsed.trainingPromotedToday=false;
 
 // DAILY MODE SYSTEM MIGRATION
 if(typeof parsed.modeDate==="undefined") parsed.modeDate=getDayKey();
@@ -2101,6 +2104,7 @@ function resetTrainingForNewDay(){
   state.trainingDate=todayKey;
   state.todayDrills=0;
   state.trainingCompleteToday=false;
+state.trainingPromotedToday=false;
 }
 
 function showTrain(playSound=true){
@@ -2146,14 +2150,20 @@ function showTrain(playSound=true){
 
   html+="</div>";
   html+="<div class='panel-buttons'>";
-  html+="<button class='mini-btn' onclick='addTrainingDrill()'>+1 DRILL</button>";
-  html+="<button class='mini-btn' onclick='showMain()'>BACK</button>";
-  html+="</div>";
+  html+="<button class='mini-btn' onclick='removeTrainingDrill()'>-1</button>";
+html+="<button class='mini-btn' onclick='addTrainingDrill()'>+1</button>";
+html+="<button class='mini-btn' onclick='showMain()'>BACK</button>";  html+="</div>";
   html+="</div>";
 
   document.getElementById("playArea").innerHTML=html;
 
   saveState();
+}
+
+function playTrainingNote(progress){
+  const scale=[0,1,2,3,4,5,6,7,6,5,4,3,2,1,0];
+  const idx=scale[(progress-1) % scale.length];
+  playVowNote(idx);
 }
 
 function addTrainingDrill(){
@@ -2174,6 +2184,7 @@ function addTrainingDrill(){
     if(state.trainingCompletedDays>0 && state.trainingCompletedDays%TRAINING_PROMOTION_DAYS===0){
       state.trainingRank++;
       state.trainingTarget++;
+state.trainingPromotedToday=true;
       promoted=true;
     }
   }
@@ -2189,9 +2200,40 @@ function addTrainingDrill(){
   if(state.trainingCompleteToday && state.todayDrills===state.trainingTarget){
     play("good");
   }else{
-    playVowNote(state.todayDrills);
+    playTrainingNote(state.todayDrills);
   }
 
+  showTrain(false);
+}
+
+function removeTrainingDrill(){
+  if(!requirePower()) return;
+
+  resetTrainingForNewDay();
+
+  if(state.todayDrills<=0){
+    play("reset");
+    showTrain(false);
+    return;
+  }
+
+  if(state.trainingPromotedToday && state.todayDrills<=state.trainingTarget){
+    state.trainingRank=Math.max(0,state.trainingRank-1);
+    state.trainingTarget=Math.max(1,state.trainingTarget-1);
+    state.trainingPromotedToday=false;
+  }
+
+  state.todayDrills--;
+  state.lifetimeDrills=Math.max(0,state.lifetimeDrills-1);
+
+  if(state.trainingCompleteToday && state.todayDrills<state.trainingTarget){
+    state.trainingCompleteToday=false;
+    state.trainingDays=Math.max(0,state.trainingDays-1);
+    state.trainingCompletedDays=Math.max(0,state.trainingCompletedDays-1);
+  }
+
+  play("reset");
+  saveState();
   showTrain(false);
 }
 
@@ -2941,6 +2983,7 @@ if(typeof state.lifetimeDrills==="undefined") state.lifetimeDrills=0;
 if(typeof state.trainingDays==="undefined") state.trainingDays=0;
 if(typeof state.trainingCompletedDays==="undefined") state.trainingCompletedDays=0;
 if(typeof state.trainingCompleteToday==="undefined") state.trainingCompleteToday=false;
+if(typeof state.trainingPromotedToday==="undefined") state.trainingPromotedToday=false;
 
 
 ensureVault();
