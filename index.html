@@ -285,8 +285,9 @@ transform:scaleX(-1);
 
 .gate-img{
   width:100%;
+  height:auto;
   max-width:none;
-  max-height:170px;
+  max-height:none;
   object-fit:contain;
   image-rendering:pixelated;
   image-rendering:crisp-edges;
@@ -506,7 +507,7 @@ const powerQuotes=[
   }
 ];
 
-const APP_VERSION="8.0.1";
+const APP_VERSION="8.0.2";
 const DEBUG_MODE=false;
 const days=["SUNDAY","MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY"];
 let todayIndex=getTradingDayIndex();
@@ -2379,7 +2380,7 @@ function showMorningGate(){
   html+="<div class='panel'>";
   html+="<div class='panel-title'>CAN YOU TRADE?</div>";
 
-  html+="<div class='scroll' style='display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:10px;text-align:center;'>";
+  html+="<div class='scroll' style='padding:0;display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:10px;text-align:center;'>";
 
   html+="<div style='flex:1;display:flex;align-items:center;justify-content:center;width:100%;'>";
   html+="<img id='gateImg' class='gate-img' src='gate1.png'>";
