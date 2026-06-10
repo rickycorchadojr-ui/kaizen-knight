@@ -166,7 +166,17 @@ transform:scaleX(-1);
   margin:8px 0;
 }
 .gallery-wrap{width:100%;height:100%;display:flex;flex-direction:column;background:#f8f8f8;}
-.gallery-title{text-align:center;font-size:21px;padding:5px 0;border-bottom:4px solid #111;flex-shrink:0;white-space:nowrap;overflow:hidden;}
+.gallery-title{
+  text-align:center;
+  font-size:21px;
+  padding:5px 0;
+  border-bottom:4px solid #111;
+  flex-shrink:0;
+  white-space:nowrap;
+  overflow-x:auto;
+  overflow-y:hidden;
+  -webkit-overflow-scrolling:touch;
+}
 .gallery-tab{cursor:pointer;}
 .gallery-hall{flex:1;overflow-x:auto;overflow-y:hidden;white-space:nowrap;background:#f8f8f8;box-sizing:border-box;scroll-snap-type:none;-webkit-overflow-scrolling:touch;}
 .gallery-room{display:inline-flex;vertical-align:top;width:100%;height:100%;box-sizing:border-box;position:relative;background:#f8f8f8 url("gallery_bg.png") center/cover no-repeat;image-rendering:pixelated;image-rendering:crisp-edges;justify-content:center;align-items:flex-end;padding:18px 18px 20px;}
@@ -743,7 +753,7 @@ const powerQuotes=[
   }
 ];
 
-const APP_VERSION="8.2.6";
+const APP_VERSION="8.2.7";
 const DEBUG_MODE=false;
 const days=["SUNDAY","MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY"];
 let todayIndex=getTradingDayIndex();
